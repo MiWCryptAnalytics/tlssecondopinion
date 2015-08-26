@@ -1,0 +1,81 @@
+
+div.report_connection_params	{
+	background-color: mintcream;
+	padding: 10px;
+}
+
+div.report_connection_params > table {
+	font-family: monospace;
+}
+
+div.report_pem > p {
+	font-family: monospace;
+	font-size: x-small;
+}
+
+div.report_cert_pubkey_data > p {
+	font-family: monospace;
+	font-size: small;
+}
+div.report_cert_pubkey_data {
+	padding: 10px;
+	margin: 10px;
+	border: 2px solid black;
+	display: inline-block;
+}
+
+
+div.report_pem {
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid black;
+	display: inline-block;
+}
+
+div.index_footer {
+	float: right;
+}
+
+.tooltip-inner {
+	max-width: 500px !important;
+}
+
+div.server_cipher {
+	padding: 10px;
+	font-size: x-large;
+}
+
+table.ciphersuite_table {
+	width: 100%;
+	padding: 10px;
+	margin: 10px;
+	border: 1px solid black;
+	color: blue;
+
+}
+
+div.ciphersuite_desc {
+	font-size: x-small;
+}
+
+div.report_header {
+	border: 1px solid black;
+	display: inline-block;
+	padding: 20px;
+}
+
+div.tls_comment {
+	display: inline-block;
+	border: 1px dashed;
+	padding: 10px;
+}
+
+div.tls_v {
+    font-size: x-large;
+}
+
+div.server_certificate_comment {
+	display: inline-block;
+	border: 1px dashed;
+	padding: 10px;
+}

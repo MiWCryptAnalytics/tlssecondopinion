@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block body_block %}
+<div class="container-fluid">
+	<h1>TLS Second Opinion <img src="{% static 'img/beta.png' %}"></h1>
+	<hr>
+	<div class="row">
+		<div class="span2">
+			<img src="{% static 'img/doctor.png' %}">
+		</div>
+		<div class="span6">
+			<p><h3>Want a second opinion on your https://?</h3></p>
+			<p><h4>Scan a SSL/TLS https:// service:</h4>
+			<h5><li>Domain and Server Details</li></h5>
+			<h5><li>Certificate Validity Check</li></h5>
+			<h5><li>Server Cryptography Strength</li></h5>
+			<h5><li>SSL Vulnerabilities</li></h5></p>
+			<p>
+			TLS Second Opinion is a instant report generator that performs a quick check-up
+			on the Transport Layer Security component of your secure website.
+			</p>
+			<p>
+			We offer a free TLS vulnerability scanner and reporting service to the Internet community,
+			with the aim to promote strong cryptography and secure communications on the public internet.
+			</p>
+			<p>
+			</p>
+			{% if not user.is_authenticated %}
+						<p>
+						<a href="{% url 'register' %}">Register Here</a> for updates.
+						</p>
+			{% endif %}
+		</div>
+		<div class="row">
+		<div class="index-form span 2"> 
+			<form action="submitscan" method="post">
+		
+			<div class="form-group">
+				<label for="hostname">Host Name or IP Address:</label>
+				<input type="text" placeholder="google.com" name="hostname" class="form-control" id="hostname">
+			</div>
+			<div class="form-group">
+				<label for="port">Port:</label>
+				<input type="text" value="443" name="port" class="form-control" id="port">
+				{% csrf_token %}
+			</div>
+			<button type="submit" class="btn btn-primary btn-large">Scan!</button>
+			</form>
+		</div>
+		</div>
+	</div>
+		
+</div>
+
+<div class="container-fluid pull-right text-right">
+	<img src="{% static 'img/11688525.png' %}">
+	<p>twitter: @_MiW</p>
+	<p>github: <a href="https://github.com/MiWCryptAnalytics">MiWCryptAnalytics</a></p>
+	<b>TLS Second Opinion is a service brought to you by MiWCryptAnalytics</b>
+</div>
+{% endblock %}
+

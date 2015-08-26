@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}TLS Report{% endblock %}
+
+{% block body_block %}
+   <h1>TLS Report</h1>
+	<div class="panel-group" id="accordionOne">
+		<div class="panel panel-default">
+
+			{% autoescape off %}			
+			{{ error }}
+			{% endautoescape %}
+
+		</div>
+	</div>
+{% endblock %}
+

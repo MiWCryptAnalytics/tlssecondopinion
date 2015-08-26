@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}TLS Second Opinion :: Quick TLS Report [{{ hostname }}:{{ port }}]{% endblock %}
+
+{% block body_block %}
+<h1>Quick TLS Report</h1>
+<h3>by TLS Second Opinion</h3>
+
+   <div class="report_header"><p>
+   This is a sample report for {{ hostname }} on tcp port {{ port }}.</br>
+   Report Generation Date: {{ date }} UTC</br>
+   {% if user.is_authenticated %}
+   Scan for: {{ user.username }}</br>
+   {% endif %}
+   Quick Scan Report Template Version 1.1 (Template Date: 25/08/2015)
+   <img src="{% static 'img/beta.png' %}">
+   </p> 
+   </div>
+   <br>
+	<script>
+	$(document).ready(function(){
+	    $('[data-toggle="popover"]').tooltip(); 
+	});
+	</script>
+	<p>
+	<div class="report_process">
+	<h3>Scan Process</h3>
+	On {{ scan_date }} UTC, a <a href="#" data-toggle="popover" data-placement="bottom" title="NOT (SSL.VERIFY_PEER|SSL.VERIFY_FAIL_IF_NO_PEER_CERT)">non-verifying OpenSSL context</a> was connected with {{hostname}}:{{port}}.<br>
+	The simulated client is running  {{ openssl_version }} and sent a ClientHello with the <a href="#" data-toggle="popover" data-placement="bottom" title="
+		{% for c in openssl_ciphers %}{{ c }}:{% endfor %}">default set of CipherSuites</a> in SSLv23_method() [Auto-Negotiate].
+	</div>
+	</p>
+	<h3>Server and Domain Details</h3>
+	<div class="row"> 
+		<div class="span6">
+			<table class="table">
+				<tr><td><b>Server IP and Port</b></td><td>{{ server_ip }}:{{ server_port }}</td></tr>
+				{% for key, value in server_geo.items %}
+				<tr><td><b>{{key}}</b></td><td>{{value}}</td></tr>
+				{% endfor %}
+			</table>
+		</div>
+		<div class="span6">
+			<div class="row"><table class="table">
+				<tr><td><b>Whois Name</b></td><td>{{server_whois.name}}</td></tr>
+				<tr><td><b>Whois Handle</b></td><td>{{server_whois.handle}}</td></tr>
+				
+			</div></table>
+			<div class="row text-center">
+				<img src="https://maps.googleapis.com/maps/api/staticmap?center={{ server_geo.location.0 }},{{ server_geo.location.1 }}&zoom={{ server_geo.zoom }}&size=300x300&key={{ google_maps_api_key }}">
+			</div>
+	
+		</div>
+	</div>
+	<div class="row">
+		<div class="span12">
+			<table class = "table">
+			<tr><td><b>Whois IP Registration Links</b></td><td><table class="table">{% for link in server_whois.links %}<tr><td>{{link|safe}}</td></tr>{% endfor %}</table></td></tr>
+			<tr><td><b>Whois IP Registration Entities</b></td><td><table class="table">{% for entity in server_whois.entities %}<tr><td>{{entity|safe}}</td></tr>{% endfor %}</table></td></tr>
+				</table>
+		</div>
+	</div>
+	<br>	
+	<h3>Server Cryptography</h3>
+	Server negotiated the following CipherSuite: <br>
+		<div class="server_cipher">
+			{{ server_cipher }}
+		</div>
+		<div class="ciphersuite_opinion ">
+			{{ ciphersuite_opinion }}</div><br>
+
+		<div class="TLSVersion row">
+			<h4>SSL/TLS Version</h4>
+			<div class="tls_comment span5">{{ tls_version_comment| linebreaks }}</div>
+			<div class="tls_v span3">{{ tls_version| linebreaks }}</div>
+			<div class="tls_version_opinion span4">{{ tls_version_opinion| safe }}</div>
+		</div>	
+		<div class="KeyExchange row">
+			<h4>Key Exchange</h4>
+			<div class="tls_comment span5">{{ tls_kx_comment| linebreaks }}</div>
+			<div class="tls_v span3">{{ tls_kx| linebreaks }}</div>
+			<div class="tls_kx_opinion span4">{{ tls_kx_opinion| safe }}</div>
+		</div>
+		<div class="Authentication row">
+			<h4>Authentication</h4>
+			<div class="tls_comment span5">{{ tls_auth_comment| linebreaks }}</div>
+			<div class="tls_v span3">{{ tls_auth | linebreaks }}</div>
+			<div class="tls_auth_opinion span4">{{ tls_auth_opinion| safe }}</div>
+
+		</div>
+		<div class="EncryptionCipher row ">
+			<h4>Encryption Cipher</h4>
+			<div class="tls_comment span5">{{ tls_enc_comment| linebreaks }}</div>
+			<div class="tls_v span3">{{ tls_enc | linebreaks }}</div>
+			<div class="tls_enc_opinion span4">{{ tls_enc_opinion | safe }}</div>
+		</div>
+		<div class="CipherMode row ">
+		<h4>CipherMode</h4>
+			<div class="tls_comment span5">{{ tls_cmode_comment| linebreaks }}</div>
+			<div class="tls_v span3">{{ tls_cmode | linebreaks }}</div>
+			<div class="tls_enc_opinion span4">{{ tls_cmode_opinion | safe }}</div>	
+		</div>
+
+		<div class="MAC row">
+		<h4>Message Authentication Code</h4>
+			<div class="tls_comment span5">{{ tls_mac_comment| linebreaks }}</div>
+			<div class="tls_v span3">{{ tls_mac | linebreaks }}</div>
+			<div class="tls_mac_opinion span4">{{ tls_mac_opinion | safe }}</div>	
+
+		</div>
+		</p>
+	<h3>Server Certificate</h3>
+	<div class="server_certificate_comment row"><p>
+	A Certificate is a binding of a Public Key with a Subject Identity and Certificate Extension values. <br>
+	The Certificate is <i>signed</i> by its Issuer to both prevent modifications to the certificate values, and to vouch that the Public Key does really belong to the Subject.<br>
+	The TLS library should verify this by validating the signature matches with the Issuers Public Key.<br>
+	To find the Issuers Public Key, the TLS library will check a <i>Trust Store</i>, a collection of Certification Authority Public Keys determined to be trustworthy.<br>
+	</p>
+	</div>
+	<br>
+	<br>
+	<div class="report_server_certificate row" style="{{ report_server_certificate_style | safe }}">
+			<div class="span5">
+				<div class="report_pem">
+					{{ server_certificate_pem | linebreaks }}
+				</div>
+				<div>
+					<img src='{{ report_server_certificate_image }}'>
+				</div>
+				<div>
+					Certificate signed by: {{ cert_issuer_cn }}
+				</div>
+			</div>
+			<div class="span7">
+				<div class="report_cert_header">
+				<table class="table">
+					<tr><td><b>Certificate Version: </b>{{ cert_version }}</td></tr>
+					<tr><td><b>Serial: </b>{{ cert_serial }}</td></tr>
+					<tr><td><b>Signature Algorithm: </b>{{ cert_sigAlgo }}</td></tr>
+					<tr><td><b>Issued by (Issuer): </b>{{ cert_issuer | linebreaks }}</td></tr>
+					<tr><td><b>Validity Period: </b>{{ cert_notBefore }} to {{ cert_notAfter }} <br> Time until expiry: {{ cert_dateValidityTime}} </td></tr>
+					<tr><td><b>Issued to (Subject): </b>{{ cert_subject | linebreaks }}</td></tr>
+					{% if cert_bc %}<tr><td><b>Certificate Basic Constraints: </b>{{ cert_bc }}</td></tr>{% endif %}
+					{% if cert_ku %}<tr><td><b>Key Usage: </b>{{ cert_ku }}</td></tr>{% endif %}
+					{% if cert_eku %}<tr><td><b>Extended Key Usage: </b>{{ cert_eku }}</td></tr>{% endif %}
+					{% if cert_aia %}<tr><td><b>Authority Infomation Access: </b>{{ cert_aia | linebreaks }}</td></tr>{% endif %}
+					{% if cert_aki %}<tr><td><b>Authority Key Identifier: </b>{{ cert_aki }}</td></tr>{% endif %}
+					{% if cert_crl %}<tr><td><b>CRL Distribution Points: </b>{{ cert_crl | linebreaks }}</td></tr>{% endif %}
+					{% if cert_cp %}<tr><td><b>Certificate Policies: </b>{{ cert_cp | linebreaks }}</td></tr>{% endif %}
+					<tr><td><b>Public Key Type: </b>{{ cert_pubkey_type }} </td></tr>
+					<tr><td><b>{{ cert_pubkey_data_name}}: </b><div class="report_cert_pubkey_data">{{ cert_pubkey_data | linebreaks }}</div></td></tr>
+					<tr><td><b>Public Key Color Art: </b>{{ cert_pubkey_data_color_html | safe }}</td></tr>
+					{# {% <!-- <tr><td><b>Debug: </b>{{ server_certificate | linebreaks }}</div></td></tr> --> #}
+				</table>
+				</div>
+			</div>
+	<div class="row">
+		<div class="report_cert_header span12">
+			<table class="table">
+				<tr><td><b>Subject Alt Name(s): </b> <table class="table"><tr>{% for name in cert_san %}<td>{% if "dNSName:" in name %}<a href="https://{{name|slice:"8:"}}"><img src="{% static 'img/earth.png' %}">{{name|slice:"8:"}}</a>{% else %}{{ name }}{% endif %}</td>{% if forloop.counter|divisibleby:3 %}</tr><tr>{% endif %}{% endfor %}</tr></table>
+			</table>
+		</div>
+	</div>
+	</div>
+	<h3>Handshake Details</h3>	
+	<div class="panel-group" id="accordionTwo">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionTwo" href="#collapseTwo">Connection Parameters (click to hide)</a>
+				</h4>
+			</div>
+			<div class="panel-collapse collapse in" id="collapseTwo">
+				<div class="panel-body">
+					<div class='report_connection_params'>
+						<table class="table">
+							<tr><td><b>Server Random: </b>{{ server_random }}</td></tr>
+							<tr><td><b>Server Random Date: </b>{{ server_random_date }}</td></tr>
+							<tr><td><b>Client Random: </b>{{ client_random }}</td></tr>
+							<tr><td><b>Client Random Date: </b>{{ client_random_date }}</td></tr>
+							<tr><td><b>Master Key: </b>{{ master_key }}</td></tr>
+							<tr><td><b>Session ID: </b>{{ session_id }}</td></tr>
+							<tr><td><b>Ticket: </b>{{ session_ticket }}</td></tr>
+							<tr><td><b>Session Ticket Lifetime: </b>{{ session_ticket_lifetime }} seconds</td></tr>
+
+						</table>
+					</div>	
+				</div>
+			</div>
+		</div>
+	</div>
+	<h3>Server Vulnerabilities</h3>
+	None Found. Additional vulnerability scanning to be developed.
+
+	In the future this will check for:
+	<ul>
+		<li>BEAST - TLS with AES||Camelia CBC CVE-2011-3389</li>
+		<li>LUCKY13 - CBC Mode and Padding Checks CVE-2013-0169 </li>
+		<li>FREAK - Export RSA Modes CVE-2015-0204</li>
+		<li>LOGJAM - Export DH CVE-2015-4000</li>
+		<li>HEARTBLEED - Openssl &lt; 1.0.1f CVE-2014-0160</li>
+		<li>CRIME - Compression enabled CVE-2012-4929</li>
+		<li>BREACH - Compression at HTTP gzip level CVE-2013-3587</li>
+		<li>POODLE - SSLv3 Padding CVE-2014-3566</li>
+		<li>BAR MITZVAH - Brute Force LSB Values CVE-2013-3587</li>
+		<li>CCSINJECT - MiTM CVE-2014-0224</li>
+		<li>SMACK - State Machine Attack</li>
+	       	<li>BERSERK - BER encoding</li>
+		<li>SKIP-TLS - Client Impersonation CVE-2015-0205</li>
+
+	</ul>
+	<h3>TLS/HTTP extensions and enhancements</h3>
+	In the future, this will check for:
+	<ul>
+		<li>HTTP Strict Transport Security</li>
+		<li>HTTP Public Key Pinning</li>
+
+	</ul>
+
+	<br>
+	<br>
+	<hr>
+	<p>
+	<h5> This report was generated TLS Second Opinion :: Quick TLS Scan, a service by MiWCryptAnalytics. (c) 2015 </h2>
+		</p>
+
+	{% endblock %}
+
+
