@@ -1,4 +1,6 @@
 import OpenSSL
+import pyasn1
+import pyasn1_modules
 from pyasn1 import debug
 from pyasn1.codec.der import decoder
 from pyasn1.type import univ
@@ -164,8 +166,16 @@ def vanillaConnect(host, port=443, attempt_protocol=OpenSSL.SSL.SSLv23_METHOD):
         server_cert_subjectaltname = decoder.decode(ext_data, asn1Spec=rfc2459.SubjectAltName())[0]
         for san in server_cert_subjectaltname:
           santype = san.getName()
-          sanuri = san.getComponent().asOctets()
-          server_cert_subjectaltname_list.append("%s:%s" % (santype, sanuri.decode()))
+          sancomponent = san.getComponent() 
+          if isinstance(sancomponent, pyasn1.type.char.IA5String):
+            sanuri = san.getComponent().asOctets().decode()
+          elif isinstance(sancomponent, pyasn1_modules.rfc2459.AnotherName):
+            san_other_oid = san.getComponent().getComponentByName('type-id')
+            san_other_value = san.getComponent().getComponentByName('value')
+            sanuri = san_other_oid.prettyPrint() + "\n" + san_other_value.prettyPrint()
+          else :
+            sanuri = san.getComponent().prettyPrint()
+          server_cert_subjectaltname_list.append("%s:%s" % (santype, sanuri))
       elif (ext_name == b'basicConstraints'):
         bc = ext_obj
       elif (ext_name == b'keyUsage'):
