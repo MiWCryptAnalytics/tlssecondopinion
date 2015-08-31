@@ -73,8 +73,7 @@ def index(request):
     return render(request, 'index.html')
 
 def do(request, targethost, targetport):
-    scanstring = "%s:%s" % (targethost, targetport)
-    returned = scanner.vanillaConnect(scanstring)
+    returned = scanner.vanillaConnect(targethost, int(targetport))
     
     if type(returned) == str:
         

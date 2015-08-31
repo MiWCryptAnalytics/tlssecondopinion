@@ -41,11 +41,6 @@ def vanillaConnect(host, port=443, attempt_protocol=OpenSSL.SSL.SSLv23_METHOD):
     """
     
     returnlist = []
-    if ":" in host:
-        host, port = host.split(":")
-        port = int(port)
-    else:
-        host = host
 
     ## time before we started connection
     scan_time = datetime.datetime.utcnow()
@@ -59,7 +54,13 @@ def vanillaConnect(host, port=443, attempt_protocol=OpenSSL.SSL.SSLv23_METHOD):
     ##ctx.use_certificate_file(os.path.join(dir, 'server.cert'))
     ##ctx.load_verify_locations("server.crt")
     ##print("%s" % OpenSSL.crypto.get_elliptic_curves())
-    rawsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
+      af, socktype, proto, canonname, sa = res
+      try:
+        rawsocket = socket.socket(af, socktype, proto)
+      except socket.error as msg:
+        rawsocket = None
+        return "Socket Error: %s" % msg
     rawsocket.settimeout(5)
     sock = SSL.Connection(ctx, rawsocket)
     sock.set_tlsext_host_name(host.encode('utf-8'))
@@ -297,7 +298,7 @@ def verify_cb(conn, cert, errnum, depth, ok):
 
 def main():
     
-    results = vanillaConnect("microsoft.com:443")
+    results = vanillaConnect("microsoft.com", 443)
     print("------------------------ Finished vanillaConnect ------------------------ ")
     if type(results) == str:
       print(results)
